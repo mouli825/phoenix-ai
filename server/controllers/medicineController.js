@@ -2,11 +2,21 @@ const Medicine = require("../models/medicines");
 
 exports.addMedicine = async (req, res) => {
   try {
+    console.log("Received Data:", req.body);
+
     const medicine = await Medicine.create(req.body);
+
+    console.log("Medicine Saved:", medicine);
 
     res.status(201).json(medicine);
   } catch (error) {
-    res.status(500).json(error);
+    console.log("===== ADD MEDICINE ERROR =====");
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
