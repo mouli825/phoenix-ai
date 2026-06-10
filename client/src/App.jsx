@@ -4,6 +4,8 @@ import axios from "axios";
 function App() {
   const [medicines, setMedicines] = useState([]);
 
+  const [search, setSearch] = useState("");
+
   const [formData, setFormData] = useState({
     productName: "",
     unit: "",
@@ -59,6 +61,22 @@ function App() {
       fetchMedicines();
     } catch (error) {
       console.log(error);
+      alert("Failed to add medicine");
+    }
+  };
+
+  const deleteMedicine = async (id) => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/medicines/${id}`
+      );
+
+      alert("Medicine Deleted");
+
+      fetchMedicines();
+    } catch (error) {
+      console.log(error);
+      alert("Delete Failed");
     }
   };
 
@@ -75,6 +93,7 @@ function App() {
           placeholder="Product Name"
           value={formData.productName}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -84,6 +103,7 @@ function App() {
           placeholder="Unit"
           value={formData.unit}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -93,6 +113,7 @@ function App() {
           placeholder="Batch No"
           value={formData.batchNo}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -102,6 +123,7 @@ function App() {
           placeholder="Purchase Price"
           value={formData.purchasePrice}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -111,6 +133,7 @@ function App() {
           placeholder="Sale Price"
           value={formData.salePrice}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -120,6 +143,7 @@ function App() {
           placeholder="Stock"
           value={formData.stock}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -132,28 +156,65 @@ function App() {
 
       <h2>Medicine Inventory</h2>
 
-      {medicines.map((medicine) => (
-        <div
-          key={medicine._id}
-          style={{
-            border: "1px solid gray",
-            padding: "10px",
-            marginBottom: "10px",
-          }}
-        >
-          <h3>{medicine.productName}</h3>
+      <input
+        type="text"
+        placeholder="Search Medicine..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{
+          padding: "10px",
+          width: "300px",
+          marginBottom: "20px",
+        }}
+      />
 
-          <p>Unit: {medicine.unit}</p>
+      <br /><br />
 
-          <p>Batch: {medicine.batchNo}</p>
+      {medicines.length === 0 ? (
+        <p>No medicines found.</p>
+      ) : (
+        medicines
+          .filter((medicine) =>
+            medicine.productName
+              .toLowerCase()
+              .includes(search.toLowerCase())
+          )
+          .map((medicine) => (
+            <div
+              key={medicine._id}
+              style={{
+                border: "1px solid gray",
+                padding: "10px",
+                marginBottom: "10px",
+              }}
+            >
+              <h3>{medicine.productName}</h3>
 
-          <p>Stock: {medicine.stock}</p>
+              <p>Unit: {medicine.unit}</p>
 
-          <p>Purchase Price: ₹{medicine.purchasePrice}</p>
+              <p>Batch: {medicine.batchNo}</p>
 
-          <p>Sale Price: ₹{medicine.salePrice}</p>
-        </div>
-      ))}
+              <p>Stock: {medicine.stock}</p>
+
+              <p>Purchase Price: ₹{medicine.purchasePrice}</p>
+
+              <p>Sale Price: ₹{medicine.salePrice}</p>
+
+              <button
+                onClick={() => deleteMedicine(medicine._id)}
+                style={{
+                  background: "red",
+                  color: "white",
+                  border: "none",
+                  padding: "8px",
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          ))
+      )}
     </div>
   );
 }
